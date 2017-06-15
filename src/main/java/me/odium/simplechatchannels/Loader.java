@@ -68,7 +68,7 @@ public class Loader extends JavaPlugin {
     // Look for defaults in the jar
     InputStream defConfigStream = getResource("StorageConfig.yml");
     if (defConfigStream != null) {
-      YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
+      YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(StorageConfigFile);
       StorageConfig.setDefaults(defConfig);
     }
   }
@@ -178,7 +178,7 @@ public class Loader extends JavaPlugin {
     if (InChannel.containsKey(player)) { // IF PLAYER IS IN A CHANNEL
       String playerName = player.getName().toLowerCase(); // get the player name
       String playerDisplayName = player.getDisplayName();
-      Player[] players = Bukkit.getOnlinePlayers(); // get all online players
+      Player[] players = (Player[]) Bukkit.getOnlinePlayers().toArray(); // get all online players
 
       InChannel.remove(player);
       ChannelMap.remove(player);
@@ -210,7 +210,7 @@ public class Loader extends JavaPlugin {
 
     } else { // if player is not in  a channel
       String playerName = player.getName().toLowerCase(); // get the player name
-      Player[] players = Bukkit.getOnlinePlayers(); // get all online players
+      Player[] players = (Player[]) Bukkit.getOnlinePlayers().toArray(); // get all online players
       String playerDisplayName = player.getDisplayName();
 
       InChannel.put(player, true);

@@ -57,7 +57,7 @@ public class PListener implements Listener {
 
     if (plugin.getConfig().getBoolean("SilenceGeneralChat") == true) { // if silence general chat is enabled
       if (!plugin.InChannel.containsKey(player)) { // if player is not in a channel
-        Player[] players = Bukkit.getOnlinePlayers(); // get a list of all players online
+        Player[] players = (Player[]) Bukkit.getOnlinePlayers().toArray(); // get a list of all players online
         chat.getRecipients().clear(); // clear chat recipients
         Set<Player> chatrecipients = chat.getRecipients(); // get empty recipient list
         for (Player cake : players) { // for all players
@@ -73,7 +73,7 @@ public class PListener implements Listener {
       String Chan = plugin.ChannelMap.get(player); // get the channel
       log.info("[" + Chan + " / " + player.getDisplayName() + "]" + message); // log the message to console
 
-      Player[] players = Bukkit.getOnlinePlayers(); // get all online players      
+      Player[] players = (Player[]) Bukkit.getOnlinePlayers().toArray(); // get all online players      
       List<String> ChanList = plugin.getStorageConfig().getStringList(Chan+".list"); // get the list of users in channel
 
       String prefixTemp = plugin.getConfig().getString("ChatPrefix.Prefix").replace("`player", player.getDisplayName()).replace("`channel", Chan);      

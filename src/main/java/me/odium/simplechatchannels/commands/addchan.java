@@ -25,7 +25,7 @@ public class addchan implements CommandExecutor {
       player = (Player) sender;
     }    
 
-    Player[] players = Bukkit.getOnlinePlayers();
+    Player[] players = (Player[]) Bukkit.getOnlinePlayers().toArray();
     if (player == null) {
       sender.sendMessage("This command can only be run by a player");
       return true;

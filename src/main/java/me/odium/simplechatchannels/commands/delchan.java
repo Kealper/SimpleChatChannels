@@ -22,7 +22,7 @@ public class delchan implements CommandExecutor {
     if (sender instanceof Player) {
       player = (Player) sender;
     }    
-    Player[] players = Bukkit.getOnlinePlayers();
+    Player[] players = (Player[]) Bukkit.getOnlinePlayers().toArray();
     String PlayerName;
 
     String ChanName = args[0].toLowerCase();

@@ -23,7 +23,7 @@ public class deluser implements CommandExecutor {
     if (sender instanceof Player) {
       player = (Player) sender;
     }
-    Player[] players = Bukkit.getOnlinePlayers();
+    Player[] players = (Player[]) Bukkit.getOnlinePlayers().toArray();
     String PlayerName;
 
     if(args.length != 2){
