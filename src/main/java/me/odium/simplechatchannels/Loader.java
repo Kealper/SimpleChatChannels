@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Iterator;
 
 import me.odium.simplechatchannels.commands.addchan;
 import me.odium.simplechatchannels.commands.addowner;
@@ -55,7 +56,7 @@ public class Loader extends JavaPlugin {
   public Map<Player, String> SpyMap = new HashMap<Player, String>();
   public int overRide = 0;
 
-  // Custom Config  
+  // Custom Config
   private FileConfiguration StorageConfig = null;
   private File StorageConfigFile = null;
 
@@ -90,7 +91,7 @@ public class Loader extends JavaPlugin {
   }
   // End Custom Config
 
-  public String myGetPlayerName(String name) { 
+  public String myGetPlayerName(String name) {
     Player caddPlayer = getServer().getPlayerExact(name);
     String pName;
     if(caddPlayer == null) {
@@ -114,7 +115,7 @@ public class Loader extends JavaPlugin {
     FileConfigurationOptions cfgOptions = cfg.options();
     cfgOptions.copyDefaults(true);
     cfgOptions.copyHeader(true);
-    saveConfig(); 
+    saveConfig();
     // Load Custom Config
     FileConfiguration ccfg = getStorageConfig();
     FileConfigurationOptions ccfgOptions = ccfg.options();
@@ -139,7 +140,7 @@ public class Loader extends JavaPlugin {
   }
 
   public void onDisable() {
-    List<String> ChansList = getStorageConfig().getStringList("Channels"); // get the channels list    
+    List<String> ChansList = getStorageConfig().getStringList("Channels"); // get the channels list
     for(String ch: ChansList){
       List<String> PList = getStorageConfig().getStringList(ch+".list"); // get the player list
       PList.removeAll(PList);
@@ -155,21 +156,21 @@ public class Loader extends JavaPlugin {
 
   public String replaceColorMacros(String str) {
     str = str.replace("`r", ChatColor.RED.toString());
-    str = str.replace("`R", ChatColor.DARK_RED.toString());        
+    str = str.replace("`R", ChatColor.DARK_RED.toString());
     str = str.replace("`y", ChatColor.YELLOW.toString());
     str = str.replace("`Y", ChatColor.GOLD.toString());
     str = str.replace("`g", ChatColor.GREEN.toString());
-    str = str.replace("`G", ChatColor.DARK_GREEN.toString());        
+    str = str.replace("`G", ChatColor.DARK_GREEN.toString());
     str = str.replace("`c", ChatColor.AQUA.toString());
-    str = str.replace("`C", ChatColor.DARK_AQUA.toString());        
+    str = str.replace("`C", ChatColor.DARK_AQUA.toString());
     str = str.replace("`b", ChatColor.BLUE.toString());
-    str = str.replace("`B", ChatColor.DARK_BLUE.toString());        
+    str = str.replace("`B", ChatColor.DARK_BLUE.toString());
     str = str.replace("`p", ChatColor.LIGHT_PURPLE.toString());
     str = str.replace("`P", ChatColor.DARK_PURPLE.toString());
     str = str.replace("`0", ChatColor.BLACK.toString());
     str = str.replace("`1", ChatColor.DARK_GRAY.toString());
     str = str.replace("`2", ChatColor.GRAY.toString());
-    str = str.replace("`w", ChatColor.WHITE.toString());    
+    str = str.replace("`w", ChatColor.WHITE.toString());
     return str;
   }
 
@@ -178,20 +179,21 @@ public class Loader extends JavaPlugin {
     if (InChannel.containsKey(player)) { // IF PLAYER IS IN A CHANNEL
       String playerName = player.getName().toLowerCase(); // get the player name
       String playerDisplayName = player.getDisplayName();
-      Player[] players = (Player[]) Bukkit.getOnlinePlayers().toArray(); // get all online players
+      Iterator players = Bukkit.getOnlinePlayers().iterator(); // get all online players
 
       InChannel.remove(player);
       ChannelMap.remove(player);
 
       List<String> ChList = getStorageConfig().getStringList(channel+".list"); // get the player list
       ChList.remove(playerName);  // remove the player from the list
-      getStorageConfig().set(channel+".list", ChList); // se      
-      saveStorageConfig(); 
+      getStorageConfig().set(channel+".list", ChList); // se
+      saveStorageConfig();
 
       // NOTIFY USERS IN CHANNEL OF A PART
       player.sendMessage(DARK_GREEN+"[SCC] "+ ChatColor.GOLD + playerDisplayName + ChatColor.DARK_GREEN+" left "+ channel);
       List<String> ChanList = getStorageConfig().getStringList(channel+".list");
-      for(Player play : players){
+      while (players.hasNext()){
+		Player play = (Player) players.next();
         if(ChanList.contains(play.getName())) {
           play.sendMessage(DARK_GREEN+"[SCC] "+ ChatColor.GOLD + playerDisplayName + ChatColor.DARK_GREEN+" left "+ channel);
         }
@@ -199,18 +201,19 @@ public class Loader extends JavaPlugin {
 
       //    NOTIFY SERVER OF A CHAT PART
       if (getConfig().getBoolean("PublicJoinPartMessages") == true) {
-        for (Player user : players) { // for all players
+        while (players.hasNext()) { // for all players
+		  Player user = (Player) players.next();
           if (!InChannel.containsKey(user)) { // if player is not in a channel
             user.sendMessage(DARK_GREEN+"[SCC] "+ ChatColor.GOLD + playerDisplayName + ChatColor.DARK_GREEN+" has joined general chat");
           }
         }
-      }      
+      }
       log.info(DARK_GREEN+"[SCC] "+ ChatColor.GOLD + playerDisplayName + ChatColor.DARK_GREEN+" has joined general chat");
-      
+
 
     } else { // if player is not in  a channel
       String playerName = player.getName().toLowerCase(); // get the player name
-      Player[] players = (Player[]) Bukkit.getOnlinePlayers().toArray(); // get all online players
+      Iterator players = Bukkit.getOnlinePlayers().iterator(); // get all online players
       String playerDisplayName = player.getDisplayName();
 
       InChannel.put(player, true);
@@ -223,20 +226,22 @@ public class Loader extends JavaPlugin {
 
       //      NOTIFY SERVER OF A CHAT JOIN
       if (getConfig().getBoolean("PublicJoinPartMessages") == true) {
-        for (Player user : players) { // for all players
+        while (players.hasNext()) { // for all players
+		  Player user = (Player) players.next();
           if (!InChannel.containsKey(user)) { // if player is not in a channel
-            user.sendMessage(DARK_GREEN+"[SCC] "+ ChatColor.GOLD + playerDisplayName + ChatColor.DARK_GREEN+" has left general chat");       
+            user.sendMessage(DARK_GREEN+"[SCC] "+ ChatColor.GOLD + playerDisplayName + ChatColor.DARK_GREEN+" has left general chat");
           }
         }
         log.info(DARK_GREEN+"[SCC] "+ ChatColor.GOLD + playerDisplayName + ChatColor.DARK_GREEN+" has left general chat");
       }
-      
-      
+
+
       // NOTIFY USERS IN CHANNEL OF A JOIN
-      List<String> ChanList = getStorageConfig().getStringList(channel+".list"); 
-      for(Player op: players){
+      List<String> ChanList = getStorageConfig().getStringList(channel+".list");
+      while (players.hasNext()){
+		Player op = (Player) players.next();
         if(ChanList.contains(op.getName().toLowerCase())) {
-          op.sendMessage(DARK_GREEN+"[SCC] "+ ChatColor.GOLD + playerDisplayName + ChatColor.DARK_GREEN+" joined "+ channel);              
+          op.sendMessage(DARK_GREEN+"[SCC] "+ ChatColor.GOLD + playerDisplayName + ChatColor.DARK_GREEN+" joined "+ channel);
         }
       }
       // SHOW TOPIC
@@ -247,20 +252,20 @@ public class Loader extends JavaPlugin {
 
     }
   }
-  
+
   public boolean NotExist(CommandSender sender, String ChanName) {
     sender.sendMessage(DARK_RED+"[SCC] Channel "+ChatColor.GOLD+ChanName+ChatColor.DARK_RED+" does not exist!");
     return true;
   }
   public boolean NotOwner(CommandSender sender, String ChanName) {
     sender.sendMessage(DARK_RED+"[SCC] "+ChatColor.DARK_RED+"you do not have owner access to: "+ChatColor.GOLD+ChanName);
-    return true;    
+    return true;
   }
   public boolean AlreadyInChannel(CommandSender sender) {
     sender.sendMessage(DARK_RED+"[SCC] "+ChatColor.DARK_RED+"You are already in a channel");
     return true;
   }
-  
-  
+
+
 
 }

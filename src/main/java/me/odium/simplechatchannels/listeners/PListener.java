@@ -3,6 +3,7 @@ package me.odium.simplechatchannels.listeners;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.Iterator;
 
 import me.odium.simplechatchannels.Loader;
 import org.bukkit.Bukkit;
@@ -19,9 +20,9 @@ public class PListener implements Listener {
   Logger log = Logger.getLogger("Minecraft");
 
   public Loader plugin;
-  public PListener(Loader plugin) {    
-    this.plugin = plugin;    
-    plugin.getServer().getPluginManager().registerEvents(this, plugin);  
+  public PListener(Loader plugin) {
+    this.plugin = plugin;
+    plugin.getServer().getPluginManager().registerEvents(this, plugin);
   }
 
 
@@ -43,7 +44,7 @@ public class PListener implements Listener {
       InChatList.remove(playerName);  // remove the player from the list
       plugin.getStorageConfig().set("InChatList", InChatList); // set th
 
-      plugin.InChannel.put(player, false);		  	  
+      plugin.InChannel.put(player, false);
       plugin.InChannel.remove(player);
       plugin.saveStorageConfig();
     }
@@ -57,10 +58,11 @@ public class PListener implements Listener {
 
     if (plugin.getConfig().getBoolean("SilenceGeneralChat") == true) { // if silence general chat is enabled
       if (!plugin.InChannel.containsKey(player)) { // if player is not in a channel
-        Player[] players = (Player[]) Bukkit.getOnlinePlayers().toArray(); // get a list of all players online
+        Iterator players = Bukkit.getOnlinePlayers().iterator(); // get a list of all players online
         chat.getRecipients().clear(); // clear chat recipients
         Set<Player> chatrecipients = chat.getRecipients(); // get empty recipient list
-        for (Player cake : players) { // for all players
+        while (players.hasNext()) { // for all players
+		  Player cake = (Player) players.next();
           if (!plugin.InChannel.containsKey(cake)) { // if player is not in channel
             chatrecipients.add(cake); // add them as a recipient
           }
@@ -73,17 +75,18 @@ public class PListener implements Listener {
       String Chan = plugin.ChannelMap.get(player); // get the channel
       log.info("[" + Chan + " / " + player.getDisplayName() + "]" + message); // log the message to console
 
-      Player[] players = (Player[]) Bukkit.getOnlinePlayers().toArray(); // get all online players      
+      Iterator players = Bukkit.getOnlinePlayers().iterator(); // get all online players
       List<String> ChanList = plugin.getStorageConfig().getStringList(Chan+".list"); // get the list of users in channel
 
-      String prefixTemp = plugin.getConfig().getString("ChatPrefix.Prefix").replace("`player", player.getDisplayName()).replace("`channel", Chan);      
-      String prefix = plugin.replaceColorMacros(prefixTemp); 
+      String prefixTemp = plugin.getConfig().getString("ChatPrefix.Prefix").replace("`player", player.getDisplayName()).replace("`channel", Chan);
+      String prefix = plugin.replaceColorMacros(prefixTemp);
 
-      for(Player op : players){        
+      while (players.hasNext()){
+		Player op = (Player) players.next();
         if (plugin.SpyMap.containsKey(op)) { // If player is using spychan
           if (plugin.SpyMap.get(op) == "all" || plugin.SpyMap.get(op).equalsIgnoreCase(Chan)) { // if player is spying on all or specific channel being used
             op.sendMessage(ChatColor.RED+"SPY: "+ChatColor.RESET+prefix +" "+ message); // send them the channel message
-          }          
+          }
         }
 
 
